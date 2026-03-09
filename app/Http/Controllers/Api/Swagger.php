@@ -11,7 +11,7 @@ use OpenApi\Attributes as OA;
     contact: new OA\Contact(email: "admin@radience.com")
 )]
 #[OA\Server(
-    url: "http://localhost:8080",
+    url: L5_SWAGGER_CONST_HOST,
     description: "API Server"
 )]
 class Swagger
