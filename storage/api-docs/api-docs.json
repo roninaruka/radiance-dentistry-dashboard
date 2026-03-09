@@ -4,13 +4,13 @@
         "title": "Radiance Dentistry API",
         "description": "API documentation for Radiance Dentistry Dashboard",
         "contact": {
-            "email": "admin@radience.com"
+            "email": "roninaruka@gmail.com"
         },
         "version": "1.0.0"
     },
     "servers": [
         {
-            "url": "http://localhost:8080/",
+            "url": "https://my.radiancedentistryclinic.com/",
             "description": "Live Server"
         },
         {

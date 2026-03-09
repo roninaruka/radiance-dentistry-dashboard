@@ -8,10 +8,10 @@ use OpenApi\Attributes as OA;
     version: "1.0.0",
     title: "Radiance Dentistry API",
     description: "API documentation for Radiance Dentistry Dashboard",
-    contact: new OA\Contact(email: "admin@radience.com")
+    contact: new OA\Contact(email: "roninaruka@gmail.com")
 )]
 #[OA\Server(
-    url: L5_SWAGGER_CONST_HOST,
+    url: "https://my.radiancedentistryclinic.com/",
     description: "Live Server"
 )]
 #[OA\Server(
