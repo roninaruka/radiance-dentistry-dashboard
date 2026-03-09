@@ -15,6 +15,8 @@ class Location extends Model
         'phone',
         'email',
         'working_hours',
+        'map_link',
+        'map_embed',
         'is_active',
     ];
 

@@ -30,46 +30,14 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Create Super Admin User
         $superAdmin = User::firstOrCreate(
-            ['email' => 'superadmin@radiance.com'],
+            ['email' => 'roninaruka@gmail.com'],
             [
-                'name' => 'Super Admin',
-                'password' => Hash::make('password'),
+                'name' => 'Sunil Kumar',
+                'password' => Hash::make('password@123'),
                 'email_verified_at' => now(),
             ]
         );
         $superAdmin->assignRole($superAdminRole);
 
-        // Create Admin User
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@radiance.com'],
-            [
-                'name' => 'Admin User',
-                'password' => Hash::make('password'),
-                'email_verified_at' => now(),
-            ]
-        );
-        $admin->assignRole($adminRole);
-
-        // Create Content Creator User
-        $contentCreator = User::firstOrCreate(
-            ['email' => 'creator@radiance.com'],
-            [
-                'name' => 'Content Creator',
-                'password' => Hash::make('password'),
-                'email_verified_at' => now(),
-            ]
-        );
-        $contentCreator->assignRole($contentCreatorRole);
-
-        // Create Receptionist User
-        $receptionist = User::firstOrCreate(
-            ['email' => 'receptionist@radiance.com'],
-            [
-                'name' => 'Receptionist',
-                'password' => Hash::make('password'),
-                'email_verified_at' => now(),
-            ]
-        );
-        $receptionist->assignRole($receptionistRole);
     }
 }

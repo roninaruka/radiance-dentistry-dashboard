@@ -82,7 +82,22 @@ class LocationResource extends Resource
                         Forms\Components\Textarea::make('working_hours')
                             ->label('Working Hours')
                             ->rows(3)
-                            ->placeholder('e.g., Mon-Fri: 9:00 AM - 6:00 PM\nSat: 9:00 AM - 2:00 PM'),
+                            ->placeholder('e.g., Mon-Fri: 9:00 AM - 6:00 PM\nSat: 9:00 AM - 2:00 PM')
+                            ->columnSpanFull(),
+                        
+                        Forms\Components\TextInput::make('map_link')
+                            ->label('Map Location Link')
+                            ->url()
+                            ->nullable()
+                            ->maxLength(2048)
+                            ->placeholder('e.g., https://maps.google.com/... (Direct link)'),
+                            
+                        Forms\Components\Textarea::make('map_embed')
+                            ->label('Map Embed Iframe')
+                            ->nullable()
+                            ->rows(4)
+                            ->placeholder('Paste the <iframe ...> code from Google Maps here')
+                            ->columnSpanFull(),
                         
                         Forms\Components\Toggle::make('is_active')
                             ->label('Active')
