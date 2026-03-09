@@ -1,0 +1,22 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use OpenApi\Attributes as OA;
+
+class TestController extends Controller
+{
+    #[OA\Get(
+        path: "/api/test",
+        tags: ["Test"],
+        summary: "Test endpoint",
+        responses: [
+            new OA\Response(response: 200, description: "OK")
+        ]
+    )]
+    public function index()
+    {
+        return response()->json(['status' => 'ok']);
+    }
+}
