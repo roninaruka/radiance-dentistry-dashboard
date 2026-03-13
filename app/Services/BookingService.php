@@ -8,7 +8,7 @@ use Carbon\Carbon;
 
 class BookingService
 {
-    public function getAvailableSlots($date)
+    public function getAvailableSlots($date, $locationId = null)
     {
         $carbonDate = Carbon::parse($date);
         
@@ -22,15 +22,28 @@ class BookingService
         $endTime = Carbon::createFromTimeString('19:00:00');
 
         // Get blocked segments
-        $blockedSegments = BlockedSlot::where('date', $date)->get();
+        $blockedQuery = BlockedSlot::where('date', $date);
+        if ($locationId) {
+            $blockedQuery->where(function($query) use ($locationId) {
+                $query->where('location_id', $locationId)
+                      ->orWhereNull('location_id'); // Global blocks apply to all clinics
+            });
+        }
+        $blockedSegments = $blockedQuery->get();
+
         if ($blockedSegments->contains('is_full_day', true)) {
             return [];
         }
 
         // Get existing appointments (confirmed)
-        $bookedSlots = Appointment::where('appointment_date', $date)
-            ->whereIn('status', ['confirmed'])
-            ->pluck('appointment_time')
+        $bookedQuery = Appointment::where('appointment_date', $date)
+            ->whereIn('status', ['confirmed']);
+        
+        if ($locationId) {
+            $bookedQuery->where('location_id', $locationId);
+        }
+
+        $bookedSlots = $bookedQuery->pluck('appointment_time')
             ->map(fn($time) => Carbon::parse($time)->format('H:i'))
             ->toArray();
 

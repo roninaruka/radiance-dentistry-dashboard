@@ -64,8 +64,13 @@ class AppointmentResource extends Resource
                             ->options(User::role('doctor')->pluck('name', 'id'))
                             ->searchable()
                             ->nullable()
-                            ->placeholder('No specific doctor')
-                            ->columnSpanFull(),
+                            ->placeholder('No specific doctor'),
+                        Forms\Components\Select::make('location_id')
+                            ->label('Clinic')
+                            ->relationship('location', 'name')
+                            ->searchable()
+                            ->required()
+                            ->preload(),
                         Forms\Components\DatePicker::make('appointment_date')->required(),
                         Forms\Components\TimePicker::make('appointment_time')
                             ->required()
@@ -99,6 +104,10 @@ class AppointmentResource extends Resource
                     ->placeholder('—')
                     ->badge()
                     ->color('info'),
+                Tables\Columns\TextColumn::make('location.name')
+                    ->label('Clinic')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable()->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('phone')->searchable(),
                 Tables\Columns\TextColumn::make('appointment_date')->date()->sortable(),

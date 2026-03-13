@@ -15,6 +15,7 @@ class Appointment extends Model
         'appointment_time',
         'patient_id',
         'doctor_id',
+        'location_id',
         'status',
         'note',
     ];
@@ -31,5 +32,10 @@ class Appointment extends Model
     public function doctor()
     {
         return $this->belongsTo(User::class, 'doctor_id');
+    }
+
+    public function location()
+    {
+        return $this->belongsTo(Location::class);
     }
 }

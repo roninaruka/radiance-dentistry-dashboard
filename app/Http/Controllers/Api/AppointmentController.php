@@ -28,6 +28,13 @@ class AppointmentController extends Controller
                 required: true,
                 description: "Date in YYYY-MM-DD format",
                 schema: new OA\Schema(type: "string", format: "date")
+            ),
+            new OA\Parameter(
+                name: "clinic_id",
+                in: "query",
+                required: false,
+                description: "Clinic ID (Location ID)",
+                schema: new OA\Schema(type: "integer")
             )
         ],
         responses: [
@@ -47,9 +54,10 @@ class AppointmentController extends Controller
     {
         $request->validate([
             'date' => 'required|date',
+            'clinic_id' => 'nullable|exists:locations,id',
         ]);
 
-        $slots = $bookingService->getAvailableSlots($request->date);
+        $slots = $bookingService->getAvailableSlots($request->date, $request->clinic_id);
 
         return response()->json([
             'date' => $request->date,
@@ -74,6 +82,7 @@ class AppointmentController extends Controller
                     new OA\Property(property: "phone", type: "string", example: "1234567890"),
                     new OA\Property(property: "reason", type: "string", example: "Checkup"),
                     new OA\Property(property: "doctor_id", type: "integer", example: 1, description: "Optional doctor ID"),
+                    new OA\Property(property: "clinic_id", type: "integer", example: 1, description: "Clinic ID (from locations)"),
                     new OA\Property(property: "captcha_token", type: "string", example: "uuid-token"),
                     new OA\Property(property: "captcha_answer", type: "string", example: "ABCD12")
                 ]
@@ -95,6 +104,8 @@ class AppointmentController extends Controller
             'email'          => 'required|email|max:255',
             'phone'          => 'required|string|max:20',
             'reason'         => 'nullable|string|max:500',
+            'doctor_id'      => 'nullable|exists:users,id',
+            'clinic_id'      => 'required|exists:locations,id',
             'captcha_token'  => 'required|string',
             'captcha_answer' => 'required|string',
         ]);
@@ -130,6 +141,7 @@ class AppointmentController extends Controller
         $appointment = Appointment::create([
             'patient_id'       => $patient->id,
             'doctor_id'        => $request->doctor_id,
+            'location_id'      => $request->clinic_id,
             'name'             => $request->name,
             'email'            => $request->email,
             'phone'            => $request->phone,

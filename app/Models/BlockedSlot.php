@@ -11,6 +11,7 @@ class BlockedSlot extends Model
         'start_time',
         'end_time',
         'is_full_day',
+        'location_id',
         'reason',
     ];
 
@@ -18,4 +19,9 @@ class BlockedSlot extends Model
         'date' => 'date',
         'is_full_day' => 'boolean',
     ];
+
+    public function location()
+    {
+        return $this->belongsTo(Location::class);
+    }
 }
