@@ -12,7 +12,6 @@ class BlogController extends Controller
     #[OA\Get(
         path: "/api/blogs",
         operationId: "getBlogs",
-        tags: ["Blogs"],
         summary: "Get list of blogs",
         description: "Returns paginated published blogs",
         responses: [
@@ -35,7 +34,6 @@ class BlogController extends Controller
     #[OA\Get(
         path: "/api/blogs/{slug}",
         operationId: "getBlog",
-        tags: ["Blogs"],
         summary: "Get single blog",
         description: "Returns a single blog by slug",
         parameters: [

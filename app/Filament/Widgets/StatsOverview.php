@@ -22,14 +22,6 @@ class StatsOverview extends BaseWidget
                 ->description('Future bookings')
                 ->descriptionIcon('heroicon-m-calendar-days')
                 ->color('info'),
-            Stat::make('Total Blogs', Blog::count())
-                ->description('Published content')
-                ->descriptionIcon('heroicon-m-document-text')
-                ->color('warning'),
-            Stat::make('Patient Reviews', Review::count())
-                ->description('Total feedbacks')
-                ->descriptionIcon('heroicon-m-star')
-                ->color('primary'),
         ];
     }
 }

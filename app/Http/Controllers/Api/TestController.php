@@ -9,7 +9,6 @@ class TestController extends Controller
 {
     #[OA\Get(
         path: "/api/test",
-        tags: ["Test"],
         summary: "Test endpoint",
         responses: [
             new OA\Response(response: 200, description: "OK")

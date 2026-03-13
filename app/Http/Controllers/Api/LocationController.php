@@ -12,7 +12,6 @@ class LocationController extends Controller
     #[OA\Get(
         path: "/api/locations",
         operationId: "getLocations",
-        tags: ["Locations"],
         summary: "Get list of clinic locations",
         description: "Returns a list of clinic branches",
         responses: [

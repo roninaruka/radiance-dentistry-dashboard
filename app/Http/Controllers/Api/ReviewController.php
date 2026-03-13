@@ -12,7 +12,6 @@ class ReviewController extends Controller
     #[OA\Get(
         path: "/api/reviews",
         operationId: "getReviews",
-        tags: ["Reviews"],
         summary: "Get list of published reviews",
         description: "Returns a list of published patient reviews",
         responses: [

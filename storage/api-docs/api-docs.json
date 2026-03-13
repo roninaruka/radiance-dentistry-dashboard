@@ -21,9 +21,6 @@
     "paths": {
         "/api/slots": {
             "get": {
-                "tags": [
-                    "Appointments"
-                ],
                 "summary": "Get available slots for a date",
                 "description": "Returns a list of available time slots",
                 "operationId": "getAvailableSlots",
@@ -67,9 +64,6 @@
         },
         "/api/appointments": {
             "post": {
-                "tags": [
-                    "Appointments"
-                ],
                 "summary": "Create a new appointment",
                 "description": "Creates an appointment and links/creates a patient record",
                 "operationId": "createAppointment",
@@ -83,7 +77,9 @@
                                     "time",
                                     "name",
                                     "email",
-                                    "phone"
+                                    "phone",
+                                    "captcha_token",
+                                    "captcha_answer"
                                 ],
                                 "properties": {
                                     "date": {
@@ -111,6 +107,19 @@
                                     "reason": {
                                         "type": "string",
                                         "example": "Checkup"
+                                    },
+                                    "doctor_id": {
+                                        "description": "Optional doctor ID",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "captcha_token": {
+                                        "type": "string",
+                                        "example": "uuid-token"
+                                    },
+                                    "captcha_answer": {
+                                        "type": "string",
+                                        "example": "ABCD12"
                                     }
                                 },
                                 "type": "object"
@@ -125,11 +134,47 @@
                 }
             }
         },
+        "/api/before-afters": {
+            "get": {
+                "summary": "Get list of active Before & After records",
+                "description": "Returns a list of active Before & After records sorted by sort order.",
+                "operationId": "getBeforeAfters",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer"
+                                            },
+                                            "title": {
+                                                "type": "string"
+                                            },
+                                            "before_image": {
+                                                "type": "string"
+                                            },
+                                            "after_image": {
+                                                "type": "string"
+                                            },
+                                            "sort_order": {
+                                                "type": "integer"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/blogs": {
             "get": {
-                "tags": [
-                    "Blogs"
-                ],
                 "summary": "Get list of blogs",
                 "description": "Returns paginated published blogs",
                 "operationId": "getBlogs",
@@ -142,9 +187,6 @@
         },
         "/api/blogs/{slug}": {
             "get": {
-                "tags": [
-                    "Blogs"
-                ],
                 "summary": "Get single blog",
                 "description": "Returns a single blog by slug",
                 "operationId": "getBlog",
@@ -168,11 +210,74 @@
                 }
             }
         },
+        "/api/captcha": {
+            "get": {
+                "summary": "Generate a new CAPTCHA",
+                "description": "Returns a base64 encoded image and a unique token for verification",
+                "operationId": "generateCaptcha",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "uuid-token"
+                                        },
+                                        "image": {
+                                            "type": "string",
+                                            "example": "data:image/png;base64,..."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/doctors": {
+            "get": {
+                "summary": "Get list of doctors",
+                "description": "Returns a list of all users with the doctor role",
+                "operationId": "getDoctors",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Dr. Smith"
+                                            },
+                                            "email": {
+                                                "type": "string",
+                                                "format": "email",
+                                                "example": "doctor@example.com"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/faqs": {
             "get": {
-                "tags": [
-                    "FAQs"
-                ],
                 "summary": "Get list of active FAQs",
                 "description": "Returns a list of active FAQs sorted by sort order. Optional tag filter.",
                 "operationId": "getFaqs",
@@ -224,9 +329,6 @@
         },
         "/api/locations": {
             "get": {
-                "tags": [
-                    "Locations"
-                ],
                 "summary": "Get list of clinic locations",
                 "description": "Returns a list of clinic branches",
                 "operationId": "getLocations",
@@ -269,9 +371,6 @@
         },
         "/api/reviews": {
             "get": {
-                "tags": [
-                    "Reviews"
-                ],
                 "summary": "Get list of published reviews",
                 "description": "Returns a list of published patient reviews",
                 "operationId": "getReviews",
@@ -312,9 +411,6 @@
         },
         "/api/health": {
             "get": {
-                "tags": [
-                    "Health"
-                ],
                 "summary": "Health check",
                 "operationId": "50bc6dc8224745cd0b9f7bb96ca7ae5f",
                 "responses": {
@@ -326,9 +422,6 @@
         },
         "/api/test": {
             "get": {
-                "tags": [
-                    "Test"
-                ],
                 "summary": "Test endpoint",
                 "operationId": "af4eef7c415174b57a22c482494a6a28",
                 "responses": {
@@ -338,35 +431,5 @@
                 }
             }
         }
-    },
-    "tags": [
-        {
-            "name": "Appointments",
-            "description": "Appointments"
-        },
-        {
-            "name": "Blogs",
-            "description": "Blogs"
-        },
-        {
-            "name": "FAQs",
-            "description": "FAQs"
-        },
-        {
-            "name": "Locations",
-            "description": "Locations"
-        },
-        {
-            "name": "Reviews",
-            "description": "Reviews"
-        },
-        {
-            "name": "Health",
-            "description": "Health"
-        },
-        {
-            "name": "Test",
-            "description": "Test"
-        }
-    ]
+    }
 }

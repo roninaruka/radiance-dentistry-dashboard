@@ -22,7 +22,6 @@ class Swagger
 {
     #[OA\Get(
         path: "/api/health",
-        tags: ["Health"],
         summary: "Health check",
         responses: [
             new OA\Response(response: 200, description: "OK")

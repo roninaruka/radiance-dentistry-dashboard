@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\AppointmentResource\Pages;
 use App\Models\Appointment;
 use App\Models\Patient;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
@@ -58,6 +59,13 @@ class AppointmentResource extends Resource
                 
                 Forms\Components\Section::make('Booking Details')
                     ->schema([
+                        Forms\Components\Select::make('doctor_id')
+                            ->label('Assigned Doctor')
+                            ->options(User::role('doctor')->pluck('name', 'id'))
+                            ->searchable()
+                            ->nullable()
+                            ->placeholder('No specific doctor')
+                            ->columnSpanFull(),
                         Forms\Components\DatePicker::make('appointment_date')->required(),
                         Forms\Components\TimePicker::make('appointment_time')
                             ->required()
@@ -84,6 +92,13 @@ class AppointmentResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->url(fn (Appointment $record): ?string => $record->patient_id ? PatientResource::getUrl('edit', ['record' => $record->patient_id]) : null),
+                Tables\Columns\TextColumn::make('doctor.name')
+                    ->label('Doctor')
+                    ->searchable()
+                    ->sortable()
+                    ->placeholder('—')
+                    ->badge()
+                    ->color('info'),
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable()->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('phone')->searchable(),
                 Tables\Columns\TextColumn::make('appointment_date')->date()->sortable(),

@@ -10,14 +10,15 @@ use App\Services\BookingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use App\Mail\AppointmentConfirmed;
+use App\Mail\AppointmentConfirmedDoctor;
 
 class AppointmentController extends Controller
 {
     #[OA\Get(
         path: "/api/slots",
         operationId: "getAvailableSlots",
-        tags: ["Appointments"],
         summary: "Get available slots for a date",
         description: "Returns a list of available time slots",
         parameters: [
@@ -59,20 +60,22 @@ class AppointmentController extends Controller
     #[OA\Post(
         path: "/api/appointments",
         operationId: "createAppointment",
-        tags: ["Appointments"],
         summary: "Create a new appointment",
         description: "Creates an appointment and links/creates a patient record",
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ["date", "time", "name", "email", "phone"],
+                required: ["date", "time", "name", "email", "phone", "captcha_token", "captcha_answer"],
                 properties: [
                     new OA\Property(property: "date", type: "string", format: "date", example: "2025-10-10"),
                     new OA\Property(property: "time", type: "string", example: "10:00"),
                     new OA\Property(property: "name", type: "string", example: "John Doe"),
                     new OA\Property(property: "email", type: "string", format: "email", example: "john@example.com"),
                     new OA\Property(property: "phone", type: "string", example: "1234567890"),
-                    new OA\Property(property: "reason", type: "string", example: "Checkup")
+                    new OA\Property(property: "reason", type: "string", example: "Checkup"),
+                    new OA\Property(property: "doctor_id", type: "integer", example: 1, description: "Optional doctor ID"),
+                    new OA\Property(property: "captcha_token", type: "string", example: "uuid-token"),
+                    new OA\Property(property: "captcha_answer", type: "string", example: "ABCD12")
                 ]
             )
         ),
@@ -86,13 +89,26 @@ class AppointmentController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'date' => 'required|date',
-            'time' => 'required',
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'required|string|max:20',
-            'reason' => 'nullable|string|max:500',
+            'date'           => 'required|date',
+            'time'           => 'required',
+            'name'           => 'required|string|max:255',
+            'email'          => 'required|email|max:255',
+            'phone'          => 'required|string|max:20',
+            'reason'         => 'nullable|string|max:500',
+            'captcha_token'  => 'required|string',
+            'captcha_answer' => 'required|string',
         ]);
+
+        // Verify CAPTCHA
+        $cacheKey = 'captcha_' . $request->captcha_token;
+        $expected = \Illuminate\Support\Facades\Cache::get($cacheKey);
+
+        if (!$expected || strtoupper($request->captcha_answer) !== strtoupper($expected)) {
+            return response()->json(['message' => 'Invalid or expired CAPTCHA. Please try again.'], 422);
+        }
+
+        // Delete CAPTCHA from cache (single-use)
+        \Illuminate\Support\Facades\Cache::forget($cacheKey);
 
         // Find or Create Patient
         $patient = Patient::firstOrCreate(
@@ -112,27 +128,105 @@ class AppointmentController extends Controller
         }
 
         $appointment = Appointment::create([
-            'patient_id' => $patient->id,
-            'name' => $request->name, // Keep name for historical record in appointment
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'reason' => $request->reason,
+            'patient_id'       => $patient->id,
+            'doctor_id'        => $request->doctor_id,
+            'name'             => $request->name,
+            'email'            => $request->email,
+            'phone'            => $request->phone,
+            'reason'           => $request->reason,
             'appointment_date' => $request->date,
             'appointment_time' => $request->time,
-            'status' => 'pending',
+            'status'           => 'pending',
         ]);
 
-        // Send confirmation email
+        // Send notification email directly to all doctors (shared hosting friendly, no queue needed)
+        try {
+            $doctors = \App\Models\User::role('doctor')->get();
+            foreach ($doctors as $doctor) {
+                Mail::to($doctor->email)->send(new \App\Mail\AppointmentPendingDoctorEmail($appointment));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Doctor mail failed: ' . $e->getMessage());
+        }
+
+        return response()->json([
+            'message' => 'Appointment request submitted successfully. Our team will confirm your appointment shortly.',
+            'appointment' => $appointment->load('patient'),
+        ], 201);
+    }
+
+    public function confirm(Request $request, Appointment $appointment)
+    {
+        if (! $request->hasValidSignature()) {
+            abort(401, 'Invalid or expired signature.');
+        }
+
+        if ($appointment->status !== 'pending') {
+             return view('appointment.status', [
+                'title' => 'Appointment Status',
+                'status' => 'error',
+                'heading' => 'Already Processed',
+                'message' => 'This appointment has already been ' . $appointment->status . '.'
+            ]);
+        }
+
+        $appointment->update(['status' => 'confirmed']);
+
+        // Send confirmation email to patient and admin/doctors
         try {
              Mail::to($appointment->email)->send(new AppointmentConfirmed($appointment));
-             Mail::to('admin@radiance.com')->send(new AppointmentConfirmed($appointment));
+             // You can loop through doctors here or just send to admin
+             $doctors = \App\Models\User::role('doctor')->get();
+             foreach ($doctors as $doctor) {
+                 Mail::to($doctor->email)->send(new AppointmentConfirmedDoctor($appointment));
+             }
         } catch (\Exception $e) {
             \Log::error('Mail failed: ' . $e->getMessage());
         }
 
-        return response()->json([
-            'message' => 'Appointment created successfully',
-            'appointment' => $appointment->load('patient'),
-        ], 201);
+        return view('appointment.status', [
+            'title' => 'Appointment Confirmed',
+            'status' => 'success',
+            'heading' => 'Appointment Confirmed!',
+            'message' => 'The appointment for ' . $appointment->name . ' has been successfully confirmed. A notification email has been sent to the patient.'
+        ]);
+    }
+
+    public function cancel(Request $request, Appointment $appointment)
+    {
+        if (! $request->hasValidSignature()) {
+            abort(401, 'Invalid or expired signature.');
+        }
+
+        if ($appointment->status !== 'pending') {
+             return view('appointment.status', [
+                'title' => 'Appointment Status',
+                'status' => 'error',
+                'heading' => 'Already Processed',
+                'message' => 'This appointment has already been ' . $appointment->status . '.'
+            ]);
+        }
+
+        $appointment->update(['status' => 'cancelled']);
+
+        // Send cancellation email to patient
+        try {
+             Mail::to($appointment->email)->send(new \App\Mail\AppointmentCancelledEmail($appointment));
+
+             // Also notify all doctors about the cancellation
+             $doctors = \App\Models\User::role('doctor')->get();
+             foreach ($doctors as $doctor) {
+                 Mail::to($doctor->email)->send(new \App\Mail\AppointmentCancelledDoctorEmail($appointment));
+             }
+        } catch (\Exception $e) {
+            \Log::error('Mail failed: ' . $e->getMessage());
+        }
+
+        return view('appointment.status', [
+            'title' => 'Appointment Cancelled',
+            'status' => 'success',
+            'heading' => 'Appointment Cancelled',
+            'message' => 'The appointment for ' . $appointment->name . ' has been cancelled. A cancellation email has been sent to the patient.'
+        ]);
     }
 }

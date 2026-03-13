@@ -11,7 +11,20 @@ services:
             - sail
         depends_on:
             - mysql
+    queue-worker:
+        build:
+            context: .
+            dockerfile: docker/Dockerfile
+        command: php artisan queue:work database --sleep=3 --tries=3 --timeout=90
+        volumes:
+            - '.:/var/www/html'
+        networks:
+            - sail
+        depends_on:
+            - mysql
+        restart: unless-stopped
     mysql:
+
         image: 'mysql:8.4'
         ports:
             - '3307:3306'

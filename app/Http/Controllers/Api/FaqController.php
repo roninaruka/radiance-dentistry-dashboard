@@ -12,7 +12,6 @@ class FaqController extends Controller
     #[OA\Get(
         path: "/api/faqs",
         operationId: "getFaqs",
-        tags: ["FAQs"],
         summary: "Get list of active FAQs",
         description: "Returns a list of active FAQs sorted by sort order. Optional tag filter.",
         parameters: [

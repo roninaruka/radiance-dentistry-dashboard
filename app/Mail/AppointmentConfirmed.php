@@ -16,7 +16,7 @@ class AppointmentConfirmed extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct(public \App\Models\Appointment $appointment)
     {
         //
     }
@@ -37,7 +37,7 @@ class AppointmentConfirmed extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.appointments.confirmed',
+            view: 'emails.appointments.confirmed',
         );
     }
 
