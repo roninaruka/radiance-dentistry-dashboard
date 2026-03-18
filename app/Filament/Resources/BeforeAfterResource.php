@@ -27,6 +27,10 @@ class BeforeAfterResource extends Resource
                 Forms\Components\TextInput::make('title')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\TextInput::make('treatment')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('problem')
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('sort_order')
                     ->required()
                     ->numeric()
@@ -50,6 +54,10 @@ class BeforeAfterResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('title')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('treatment')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('problem')
                     ->searchable(),
                 Tables\Columns\ImageColumn::make('before_image')
                     ->square(),

@@ -24,6 +24,8 @@ class BeforeAfterController extends Controller
                         properties: [
                             new OA\Property(property: "id", type: "integer"),
                             new OA\Property(property: "title", type: "string"),
+                            new OA\Property(property: "treatment", type: "string", nullable: true),
+                            new OA\Property(property: "problem", type: "string", nullable: true),
                             new OA\Property(property: "before_image", type: "string"),
                             new OA\Property(property: "after_image", type: "string"),
                             new OA\Property(property: "sort_order", type: "integer")

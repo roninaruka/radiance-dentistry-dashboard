@@ -11,6 +11,8 @@ class BeforeAfter extends Model
 
     protected $fillable = [
         'title',
+        'treatment',
+        'problem',
         'before_image',
         'after_image',
         'sort_order',
