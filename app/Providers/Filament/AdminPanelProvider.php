@@ -54,6 +54,7 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->brandLogo(asset('images/logo.png'))
-            ->brandLogoHeight('3rem');
+            ->brandLogoHeight('3rem')
+            ->favicon(asset('favicon.ico'));
     }
 }

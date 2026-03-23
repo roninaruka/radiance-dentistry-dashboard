@@ -29,7 +29,7 @@ class Settings extends Page implements HasForms
         $this->form->fill([
             'booking_amount' => Setting::get('booking_amount', 500),
             'clinic_name' => Setting::get('clinic_name', 'Radiance Dentistry'),
-            'clinic_email' => Setting::get('clinic_email', 'hi@radiancedentistryclinic.com'),
+            'clinic_email' => Setting::get('clinic_email', 'support@radiancedentistryclinic.com'),
             'clinic_phone' => Setting::get('clinic_phone', ''),
             'working_hours' => Setting::get('working_hours', 'Mon-Fri: 9:00 AM - 6:00 PM'),
         ]);

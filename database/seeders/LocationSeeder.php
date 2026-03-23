@@ -21,7 +21,7 @@ class LocationSeeder extends Seeder
                 'state' => 'Rajasthan',
                 'pincode' => '302020',
                 'phone' => '8296504553',
-                'email' => 'hi@radiancedentistryclinic.com',
+                'email' => 'support@radiancedentistryclinic.com',
                 'working_hours' => "Mon-Fri: 9:00 AM - 8:00 PM\nSat: 9:00 AM - 6:00 PM\nSun: Closed",
                 'is_active' => true,
             ]
