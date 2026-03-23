@@ -48,5 +48,8 @@ class AppServiceProvider extends ServiceProvider
             \Illuminate\Mail\Events\MessageSent::class,
             \App\Listeners\LogSentEmail::class,
         );
+
+        // Register Appointment Observer for automatic emails
+        \App\Models\Appointment::observe(\App\Observers\AppointmentObserver::class);
     }
 }

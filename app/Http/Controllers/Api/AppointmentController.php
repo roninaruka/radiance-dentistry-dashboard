@@ -151,16 +151,6 @@ class AppointmentController extends Controller
             'status'           => 'pending',
         ]);
 
-        // Send notification email directly to all doctors (shared hosting friendly, no queue needed)
-        try {
-            $doctors = \App\Models\User::role('doctor')->get();
-            foreach ($doctors as $doctor) {
-                Mail::to($doctor->email)->send(new \App\Mail\AppointmentPendingDoctorEmail($appointment));
-            }
-        } catch (\Exception $e) {
-            \Log::error('Doctor mail failed: ' . $e->getMessage());
-        }
-
         return response()->json([
             'message' => 'Appointment request submitted successfully. Our team will confirm your appointment shortly.',
             'appointment' => $appointment->load('patient'),
@@ -183,18 +173,6 @@ class AppointmentController extends Controller
         }
 
         $appointment->update(['status' => 'confirmed']);
-
-        // Send confirmation email to patient and admin/doctors
-        try {
-             Mail::to($appointment->email)->send(new AppointmentConfirmed($appointment));
-             // You can loop through doctors here or just send to admin
-             $doctors = \App\Models\User::role('doctor')->get();
-             foreach ($doctors as $doctor) {
-                 Mail::to($doctor->email)->send(new AppointmentConfirmedDoctor($appointment));
-             }
-        } catch (\Exception $e) {
-            \Log::error('Mail failed: ' . $e->getMessage());
-        }
 
         return view('appointment.status', [
             'title' => 'Appointment Confirmed',
@@ -220,19 +198,6 @@ class AppointmentController extends Controller
         }
 
         $appointment->update(['status' => 'cancelled']);
-
-        // Send cancellation email to patient
-        try {
-             Mail::to($appointment->email)->send(new \App\Mail\AppointmentCancelledEmail($appointment));
-
-             // Also notify all doctors about the cancellation
-             $doctors = \App\Models\User::role('doctor')->get();
-             foreach ($doctors as $doctor) {
-                 Mail::to($doctor->email)->send(new \App\Mail\AppointmentCancelledDoctorEmail($appointment));
-             }
-        } catch (\Exception $e) {
-            \Log::error('Mail failed: ' . $e->getMessage());
-        }
 
         return view('appointment.status', [
             'title' => 'Appointment Cancelled',
