@@ -4,13 +4,15 @@ namespace App\Filament\Widgets;
 
 use App\Models\Appointment;
 use App\Models\Patient;
-use App\Models\Blog;
-use App\Models\Review;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class StatsOverview extends BaseWidget
 {
+    protected static ?string $pollingInterval = null;
+
+    protected static ?int $sort = 0;
+
     protected function getStats(): array
     {
         return [

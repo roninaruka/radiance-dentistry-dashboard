@@ -54,7 +54,7 @@
             </div>
             
             <p style="text-align: center; margin-top: 20px; font-size: 14px; color: #666;">Or view full details in your admin panel:</p>
-            <a href="{{ url('/admin/appointments/' . $appointment->id) }}" class="btn btn-view">Open in Dashboard</a>
+            <a href="{{ url('/appointments/' . $appointment->id . '/edit') }}" class="btn btn-view">Open in Dashboard</a>
         </div>
 
         <div class="footer">

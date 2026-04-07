@@ -45,7 +45,7 @@
             @include('emails.partials.clinic_info')
 
             <p style="text-align: center; margin-top: 20px; font-size: 14px; color: #666;">View this record in your dashboard:</p>
-            <a href="{{ url('/admin/appointments/' . $appointment->id) }}" class="btn-view">View Appointment</a>
+            <a href="{{ url('/appointments/' . $appointment->id . '/edit') }}" class="btn-view">View Appointment</a>
         </div>
 
         <div class="footer">

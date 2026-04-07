@@ -10,6 +10,8 @@ use Filament\Widgets\TableWidget as BaseWidget;
 
 class LatestPatients extends BaseWidget
 {
+    protected static ?string $pollingInterval = null;
+
     protected static ?int $sort = 4;
     
     protected int | string | array $columnSpan = 'full';

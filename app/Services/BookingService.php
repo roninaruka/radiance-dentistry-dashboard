@@ -19,7 +19,7 @@ class BookingService
 
         $slots = [];
         $startTime = Carbon::createFromTimeString('09:00:00');
-        $endTime = Carbon::createFromTimeString('19:00:00');
+        $endTime = Carbon::createFromTimeString('20:01:00');
 
         // Get blocked segments
         $blockedQuery = BlockedSlot::where('date', $date);

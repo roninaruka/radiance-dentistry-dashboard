@@ -1,2 +1,0 @@
-<img src="<?php echo e(asset('images/logo.png')); ?>" <?php echo e($attributes); ?> alt="Radiance Dentistry Logo" />
-<?php /**PATH /var/www/html/resources/views/components/application-logo.blade.php ENDPATH**/ ?>
